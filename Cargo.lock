@@ -627,6 +627,7 @@ dependencies = [
  "hyper",
  "log",
  "log4rs",
+ "serde",
  "tokio",
  "tower",
 ]

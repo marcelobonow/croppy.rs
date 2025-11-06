@@ -1,3 +1,5 @@
+mod config;
+
 use axum::{Router, routing::get};
 use log::info;
 use log4rs::{
@@ -7,11 +9,11 @@ use log4rs::{
     encode::pattern::PatternEncoder,
 };
 
+use crate::config::EnvConfig;
+
 #[tokio::main]
 async fn main() {
-    if let Err(err) = dotenvy::dotenv() {
-        eprintln!("\x1B[31mError loading env file: {}\x1B[0m", err);
-    }
+    let env_config = EnvConfig::from_env();
 
     let stdout = ConsoleAppender::builder()
         .encoder(Box::new(PatternEncoder::new("[{l}] {m}{n}")))
@@ -31,8 +33,7 @@ async fn main() {
     //TODO: Separar em um arquivo com as rotas em especifico
     let app = Router::new().route("/", get(|| async { "Hello, World!" }));
 
-    let port = 3000;
-    // run our app with hyper, listening globally on port 3000
+    let port = env_config.port;
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
         .await
         .unwrap_or_else(|e| panic!("Could not bind to port: {}. Error: {}", port, e));
